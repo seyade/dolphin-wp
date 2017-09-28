@@ -1,0 +1,76 @@
+
+// Vanilla
+let http = new XMLHttpRequest();
+http.open('POST', getHttpAuthority() + generateTokenEndpoint, true);
+http.setRequestHeader('Content-type', 'application/json');
+http.send(identifierJSON);
+
+http.onload = () => {
+  $('.citizen-form__instruction').text('Citizen login request was sent, please accept to sign in.');
+  inputStamp.text(inputValue);
+  thisFormGroup.addClass(config.animations.exit);
+  thisStepThree.removeClass(config.elemStates.hidden).addClass(config.animations.entrance);
+  self.find('.btn__text').html('SEND TOKEN AGAIN');
+  self.addClass('btn-sign-in--req-token');
+  setupWebSocketAndWaitForApiKey();
+};
+
+http.onerror = () => {
+  console.log('Sign in failed: ');
+  inputStamp.text(inputValue);
+  thisFormGroup.addClass(config.animations.exit);
+  $('.sign-in-btn-panel').addClass(config.animations.exit);
+  thisConfirmPanel.removeClass(config.elemStates.hidden).addClass(config.animations.entrance);
+};
+
+
+// jQuery
+$.ajax({
+  url: getHttpAuthority() + generateTokenEndpoint,
+  method: 'POST',
+  contentType: 'application/json',
+  data: identifierJSON
+})
+.done(response => {
+  $('.citizen-form__instruction').text('Citizen login request was sent, please accept to sign in.');
+  inputStamp.text(inputValue);
+  thisFormGroup.addClass(config.animations.exit);
+  thisStepThree.removeClass(config.elemStates.hidden).addClass(config.animations.entrance);
+  self.find('.btn__text').html('SEND TOKEN AGAIN');
+  self.addClass('btn-sign-in--req-token');
+  setupWebSocketAndWaitForApiKey();
+})
+.fail((xhr, status, error) => {
+  console.log('Sign in failed: ', error);
+
+  inputStamp.text(inputValue);
+  thisFormGroup.addClass(config.animations.exit);
+  $('.sign-in-btn-panel').addClass(config.animations.exit);
+  thisConfirmPanel.removeClass(config.elemStates.hidden).addClass(config.animations.entrance);
+});
+
+
+// Vanilla new feature
+fetch(getHttpAuthority() + generateTokenEndpoint, {
+  method: 'POST',
+  mode: 'no-cors',
+  headers: { 'Content-Type': 'application/json' },
+  body: identifier
+})
+.then(response => {
+  $('.citizen-form__instruction').text('Please approve token sent to the Citizen App in your phone.');
+  $inputStamp.text(inputValue);
+  $thisFormGroup.addClass(config.animations.exit);
+  $thisStepThree.removeClass(config.elemStates.hidden).addClass(config.animations.entrance);
+  $this.find('.btn__text').html('SEND TOKEN AGAIN');
+  $this.addClass('btn-sign-in--req-token');
+
+  setupWebSocketAndWaitForApiKey();
+})
+.catch(error => {
+  console.log('Fetch error: ', error);
+  $inputStamp.text(inputValue);
+  $thisFormGroup.addClass(config.animations.exit);
+  $('.sign-in-btn-panel').addClass(config.animations.exit);
+  $thisConfirmPanel.removeClass(config.elemStates.hidden).addClass(config.animations.entrance);
+});

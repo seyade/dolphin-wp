@@ -1,0 +1,13 @@
+// Pusle-it
+@-webkit-keyframes pulse-it {
+  to { -webkit-transform: scale(0.8); }
+}
+@-moz-keyframes pulse-it {
+  to { -moz-transform: scale(0.8); }
+}
+@-ms-keyframes pulse-it {
+  to { -ms-transform: scale(0.8); }
+}
+@keyframes pulse-it {
+  to { transform: scale(0.8); }
+}

@@ -49,7 +49,7 @@ gulp.task('js', function() {
 });
 
 gulp.task('images', function() {
-  return gulp.src('./imagres/src/*')
+  return gulp.src('./images/src/*')
     .pipe(plumber({ errorHandler: onError }))
     .pipe(imagemin({ optimizationLevel: 7, progressive: true }))
     .pipe(gulp.dest('./images/dist'))
@@ -66,7 +66,7 @@ gulp.task('images', function() {
 // });
 
 gulp.task('sass', function() {
-  return gulp.src('./sass/*.scss')
+  return gulp.src('./sass/**/*.scss')
     .pipe(sass({ 'outputStyle': 'compressed' }))
     .pipe(autoprefixer())
     .pipe(gulp.dest('./'))

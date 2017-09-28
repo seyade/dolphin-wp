@@ -1,0 +1,179 @@
+const CITIZEN = (function(CITIZEN){
+  window.CITIZEN = CITIZEN;
+})(CITIZEN || (function(){
+  
+}));
+
+
+// sdk.js - line 463
+let subscriptionCallback = (message) => {
+  if (message !== null) {
+    console.log('Received message');
+
+    let apiKey = JSON.parse(message.body).apiKey;
+    let phonePubKey = JSON.parse(message.body).phonePubKey;
+
+    if (apiKey.length > 0 && phonePubKey.length > 0) {
+      let aesKey = getECDHSharedSecret(phonePubKey);
+
+      testAESKey(nonce, aesKey);
+
+      if (subscription !== null) {
+        subscription.unsubscribe();
+      }
+
+      // There appears to be a bug in Spring where the STOMP disconnection
+      // ACK is sent after it closes the connection. For this reason
+      // socket.close() is called here rather than the STOMP disconnect
+      // method:
+      //
+      //   stompClient.disconnect(errorCallback);
+      //
+      if (socket !== null) {
+        socket.close();
+      }
+
+      document.getElementById('citizen-modal-status-container').style.display = 'block';
+      document.getElementById('citizen-modal-status').innerHTML = 'Logged in';
+
+      // set cookies
+      console.log({
+        nonce: nonce,
+        apiKey: apiKey,
+        aesKey: aesKey
+      });
+
+      setCookie('citizen-nonce', nonce, 60);
+      setCookie('citizen-apiKey', apiKey, 60);
+      setCookie('citizen-aesKey', aesKey, 60);
+
+      // call callback with response
+      let response = {
+        type: 'login',
+        status: true,
+        data: {
+          nonce: nonce,
+          apiKey: apiKey,
+          aesKey: aesKey
+        },
+      };
+
+      loginCallback && loginCallback(response);
+    } else {
+      console.log('API Key not received, reloading page.');
+
+      if (subscription !== null) {
+        subscription.unsubscribe();
+      }
+
+      if (socket !== null) {
+        socket.close();
+      }
+
+      document.getElementById('citizen-modal-status-container').style.display = 'block';
+      document.getElementById('citizen-modal-status').innerHTML = 'Login session timed out.';
+    }
+  }
+};
+
+
+
+function generateTokenOnLogin(e) {
+  let self = this;
+  let parentCardInner = findAncestor(self, 'card__inner');
+  let thisFormGroup = parentCardInner.querySelector('.citizen-form__form-group');
+  let thisStepsPanel = parentCardInner.querySelector('.citizen-form__step-panel');
+  let thisStepTwo = parentCardInner.querySelector('.step-2');
+  let thisStepThree = parentCardInner.querySelector('.step-3');
+  let thisStepFour = parentCardInner.querySelector('.step-4');
+  let thisConfirmPanel = parentCardInner.querySelector('.confirm-panel');
+  let inputStamp = document.querySelector('.citizen-form__input-stamp');
+  let signInBtnPanel = document.querySelector('.sign-in-btn-panel');
+  let instruction = document.querySelector('.citizen-form__instruction');
+
+  let originalBtnText = self.innerHTML;
+  let email = document.querySelector('#emailAddress').value;
+
+  let identifier = {
+    nonce: nonce,
+    username: email,
+    browserECDHPublicKey: browserPubKeyString
+  };
+
+  let identifierJSON = JSON.stringify(identifier);
+
+  e.preventDefault();
+
+  if (!self.classList.contains('btn-sign-in--req-token')) {
+    if (inputEmail.value.match(config.regExPattern.email)) {
+      let http = new XMLHttpRequest();
+
+      http.open('POST', getHttpAuthority() + generateTokenEndpoint, true);
+      http.setRequestHeader('Content-type', 'application/json');
+      http.send(identifierJSON);
+
+      http.onload = () => {
+        console.log('status', http.status);
+        console.log('login response', http.response);
+
+        inputStamp.innerHTML = email;
+
+        if (http.status !== 200) {
+          console.log('Sign in failed!');
+
+          thisFormGroup.classList.add(config.animations.exit);
+          signInBtnPanel.classList.add(config.animations.exit);
+          thisConfirmPanel.classList.remove(config.elemStates.hidden);
+          thisConfirmPanel.classList.add(config.animations.entrance);
+        } else {
+          console.log('Sign in fine!');
+
+          instruction.innerHTML = 'Citizen login request was sent, please accept to sign in.';
+
+          thisFormGroup.classList.add(config.animations.exit);
+          thisStepThree.classList.remove(config.elemStates.hidden);
+          thisStepThree.classList.add(config.animations.entrance);
+
+          self.querySelector('.btn__text').innerHTML = 'SEND TOKEN AGAIN';
+          self.classList.add('btn-sign-in--req-token');
+
+          setupWebSocketAndWaitForApiKey();
+        }
+      };
+
+      http.onerror = () => {
+        console.log('Oops... an error!');
+      };
+    } else {
+      thisFormGroup.classList.add('citizen-form--error');
+      thisFormGroup.querySelector('.citizen-form__input-email').classList.add('animated shake');
+      thisFormGroup.querySelector('.citizen-form__msg').innerHTML = 'Please insert a valid email!';
+    }
+  } else {
+    console.log('Sign in please!');
+  }
+}
+
+// enable and disable sign-in button
+function buttonDisabledToggle(e) {
+  let self = this;
+  let parentFormGroup = findAncestor(self, 'citizen-form__form-group');
+  let thisSignInBtn = findAncestor(parentFormGroup, 'card__inner').querySelector('.btn-sign-in');
+
+  if (self.value === '') {
+    thisSignInBtn.classList.add('btn--disabled');
+    thisSignInBtn.disabled = true;
+  } else {
+    thisSignInBtn.classList.remove('btn--disabled');
+    thisSignInBtn.disabled = false;
+  }
+
+  parentFormGroup.classList.remove('citizen-form--error');
+  self.classList.remove('animated shake');
+}
+
+inputEmail.focus();
+signInBtn.disabled = true;
+
+signInBtn.addEventListener('click', generateTokenOnLogin, false);
+inputEmail.addEventListener('keyup', buttonDisabledToggle, false);
