@@ -35,9 +35,9 @@ let onError = function(error) {
 // });
 
 gulp.task('js', function() {
-  return gulp.src(['./js/**/*.js'])
+  return gulp.src(['./js/**/*.js', './bower_components/**/*.js'])
     .pipe(babel({
-      presets: ['env']
+      presets: ['es2015']
     }))
     .pipe(jshint())
     .pipe(jshint.reporter('default'))
@@ -73,14 +73,19 @@ gulp.task('sass', function() {
     .pipe(browserSync.stream());
 });
 
-gulp.task('serve', ['sass', 'js', 'images'], function() {
+gulp.task('php', function() {
+  return gulp.src('./**/*.php')
+    .pipe(browserSync.stream());
+});
+
+gulp.task('serve', ['sass', 'php', 'js', 'images'], function() {
   browserSync.init({
     proxy: 'https://localhost/le-vrai-interactive/web-wp/wordpress'
   });
   gulp.watch('./sass/**/*.scss', ['sass']);
   gulp.watch('./js/**/*.js', ['js']);
   gulp.watch('./images/src/*', ['images']);
-  gulp.watch('./*.php').on('change', browserSync.reload);
+  gulp.watch('**/*.php', ['php']);
 });
 
 // gulp.task('default', ['serve']);

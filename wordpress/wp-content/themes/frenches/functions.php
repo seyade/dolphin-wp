@@ -117,6 +117,8 @@ add_action( 'widgets_init', 'frenches_widgets_init' );
  * Enqueue scripts and styles.
  */
 function frenches_scripts() {
+	wp_enqueue_style('bootstrap-css', 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css');
+
 	wp_enqueue_style( 'frenches-style', get_stylesheet_uri() );
 
 	wp_enqueue_script( 'frenches-scripts', get_template_directory_uri() . '/js/build.min.js', array(), '20151215', true );
@@ -126,6 +128,16 @@ function frenches_scripts() {
 	}
 }
 add_action( 'wp_enqueue_scripts', 'frenches_scripts' );
+
+/**
+ * Add SVG capabilities
+ */
+function wpcontent_svg_mime_type( $mimes = array() ) {
+  $mimes['svg']  = 'image/svg+xml';
+  $mimes['svgz'] = 'image/svg+xml';
+  return $mimes;
+}
+add_filter( 'upload_mimes', 'wpcontent_svg_mime_type' );
 
 /**
  * Implement the Custom Header feature.

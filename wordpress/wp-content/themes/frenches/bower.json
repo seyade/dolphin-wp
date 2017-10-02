@@ -1,0 +1,23 @@
+{
+  "name": "frenches",
+  "description": "theme for Le Vrai Interactive",
+  "main": "index.js",
+  "authors": [
+    "Seyade <b.kuen@hotmail.co.uk>"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/seyade/dolphin",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^3.2.1",
+    "animejs": "^2.2.0",
+    "animate.css": "^3.5.2"
+  }
+}

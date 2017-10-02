@@ -1,13 +1,51 @@
-.site-header {
+.banner {
   background-image: url('images/src/designer-working-concept@1000.jpg');
   background-repeat: no-repeat;
-  background-position: 0 0;
+  background-position: 0 -230px;
   background-size: cover;
   background-color: #333;
+  text-align: center;
   color: #fff;
+  height: 733px;
+  position: relative;
+
+  &:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: #000;
+    opacity: 0.7;
+    z-index: 5;
+  }
+}
+.banner__title-logo {
+  margin: 0;
+  position: relative;
+  z-index: 10;
+  padding: 30px 40px 0;
+
+  .image-container {
+    width: 200px;
+    display: block;
+  }
 }
 
-.site-branding__scroll-btn {
+.banner__title {
+  font-family: 'PT Sans', sans-serif;
+  font-size: 3.5rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  width: 800px;
+  margin: 100px auto 0;
+  line-height: 1.41;
+  position: relative;
+  z-index: 15;
+}
+
+.banner__scroll-down-btn {
   width: 25px;
   height: 25px;
   border-radius: 50%;
@@ -15,7 +53,8 @@
   text-indent: -9999px;
   display: block;
   position: relative;
-  margin: 0 auto;
+  z-index: 15;
+  margin: 250px auto 0;
   box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.5);
   animation: pulse-it 1.5s infinite cubic-bezier(0.66, 0, 0, 1);
 }
